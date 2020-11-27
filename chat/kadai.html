@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Chatアプリ</title>
+  <style>
+    /* この中にcssをかけます */
+    #output {
+      color:rgb(247, 156, 171);
+      font-size: 100%;
+      position:fixed;
+    }
+
+    #send:hover {
+        background: #e780d6;
+        color: #fff;
+    }
+
+  </style>
+</head>
+
+<body>
+  <!-- ブラウザの画面に見える内容 -->
+  <div>
+
+  </div>
+  <div>
+    <!-- 名前 -->
+    名前
+    <input type="text" id="username" placeholder="名前を入力してね！">
+  </div>
+
+  <div>
+    <!-- テキストエリア -->
+    内容
+    <textarea name="" id="text" cols="30" rows="10" placeholder="メッセージを入力してね！"></textarea>
+  </div>
+
+  <div>
+    <!-- 送信ボタン -->
+    <button id="send">送信</button>
+  </div>
+
+  <div>
+    <!-- 保存されたデータが表示される箇所 -->
+    <div id="output"></div>
+  </div>
+
+  <!--/ ブラウザの画面に見える内容 -->
+
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <!--** 以下Firebase **-->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <!-- ここにfirebaseのscriptを貼り付ける -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration 
+    // 自分のgoogleアカウントからfirebaseにアクセスし、<>チャットのためのコードをコピーして貼り付け
+    // firebase PDFのP23参照
+
+    var firebaseConfig = {
+      apiKey: "AIzaSyBIGyowJ7IFRaN4VrFHsEe_SV8Eh30X7MQ",
+      authDomain: "dev18-chat1122.firebaseapp.com",
+      databaseURL: "https://dev18-chat1122.firebaseio.com",
+      projectId: "dev18-chat1122",
+      storageBucket: "dev18-chat1122.appspot.com",
+      messagingSenderId: "938173256695",
+      appId: "1:938173256695:web:b98a6d2f4d6c95edbcd4f2"
+  };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    //firebaseのデーターベース（保存させる場所）を使いますよと言うjsのコードを貼り付ける
+    // xxxxxスクリプトを貼り付ける
+    const newPostRef = firebase.database().ref();
+
+    // 役者を揃える//
+    var date=new Date();
+    date.getFullYear() + "/" + (date.getMonth()+1) + "/"+ date.getDate() + "/" + date.getDay()
+    console.log(date);
+
+    // ここから下にjqueryの処理を書いて練習します
+    // 送信ボタンをクリックされたら次の処理をする
+    $("#send").on("click", function () {
+      
+      // データを登録で送る（データを送るのはこれしかないので覚える！）
+      newPostRef.push({
+        //名前
+          username: $("#username").val(),
+        //テキストエリア
+          text: $("#text").val()
+      })
+
+      // 文字を空にする。より使いやすくするための方法
+      $("#text").val(""); //空にする
+      $("#username").val(""); //空にする
+
+    });
+
+
+    // 受信処理をするならこれを使う！！必ず覚える！
+    newPostRef.on("child_added", function (data) {
+      //ここに保存されたデータが全て入ってくる
+      // function (data)のdataにfirebaseのデータが入ってくる
+        let v = data.val();
+
+      // let k = data.key; //今回は使いません
+
+      //console.logで受信=firebaseに登録されている中身を確認しよう！
+      console.log(v);
+
+      //テンプレートリテラル `` を活用して変数にhtmlを埋め込もう！ 
+      let str = `<p>${v.username}<br>${v.text}</p>`;
+
+      // ここでデータをhtmlに埋め込む prependには変数を埋め込もう！
+      $("#output").append(str);
+      $("#output").append(date);
+    });
+
+
+    $("#text").on("keydown", function (e) {
+      console.log(e, "eeeee");
+      if (e.keyCode == 13) { // Enterが押された
+        if (e.shiftKey) { // Shiftキーも押された
+          console.log(111);
+        } else {
+          newPostRef.push({
+            username: $("#username").val(), //名前
+            text: $("#text").val(), //テキストエリア
+          })
+          $("#text").val(""); //空にする
+          $("#username").val(""); //空にする
+        }
+      } else {
+      }
+    });
+
+
+
+// console.log(date.getFullYear()  + "/" + 
+// (date.getMonth()+1) + "/"+ 
+// date.getDate() + "/" + 
+// date.getDay()
+
+
+  
+  </script>
+</body>
+
+</html>
